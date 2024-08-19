@@ -6,6 +6,7 @@ ButtonUI.propTypes = {
   color: PropTypes.string.isRequired,
   borderColor: PropTypes.string.isRequired,
   mb: PropTypes.number.isRequired,
+  width: PropTypes.number.isRequired,
   onClick: PropTypes.func.isRequired,
 };
 
@@ -15,6 +16,7 @@ function ButtonUI({
   color = "rgb(5, 122, 206)",
   borderColor = "rgb(5, 122, 206)",
   mb = 0,
+  width = 100,
   onClick,
 }) {
   return (
@@ -24,6 +26,7 @@ function ButtonUI({
         color: color,
         borderColor: borderColor,
         marginBottom: mb,
+        width: width,
       }}
       className="px-2 py-1 border rounded font-bold cursor-pointer"
       onClick={onClick}

@@ -2,6 +2,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { Dropdown, Space } from "antd";
 
 function Header() {
+  // const { user } = useSelector((state) => state.userReducer);
   const handleLogOut = () => {
     // Handle logout here
     localStorage.removeItem("accessToken");
@@ -24,18 +25,20 @@ function Header() {
   return (
     <header className="z-[999] relative">
       <div className="min-w-[100px] flex m-0 p-0 relative">
-        <Dropdown
-          menu={{
-            items,
-          }}
-        >
-          <a onClick={(e) => e.preventDefault()}>
-            <Space>
-              Username
-              <DownOutlined />
-            </Space>
-          </a>
-        </Dropdown>
+        {/* {user && ( */}
+          <Dropdown
+            menu={{
+              items,
+            }}
+          >
+            <a onClick={(e) => e.preventDefault()}>
+              <Space>
+                Username
+                <DownOutlined />
+              </Space>
+            </a>
+          </Dropdown>
+        {/* )} */}
       </div>
     </header>
   );
