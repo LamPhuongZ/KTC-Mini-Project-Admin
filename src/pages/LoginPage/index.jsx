@@ -31,64 +31,67 @@ const LoginPage = () => {
   });
 
   return (
-    <section className="w-1/2 flex flex-col justify-center items-center self-stretch gap-8 bg-white relative">
-      <h1 className="text-3xl font-bold">Login to your account</h1>
-      <form onSubmit={formik.handleSubmit} id="formLogin" className="w-80 flex flex-col gap-2">
-        <label htmlFor="email" className="text-left">
-          Email
-        </label>
-        <input
-          type="text"
-          id="email"
-          {...formik.getFieldProps("email")}
-          className="border rounded p-2 mb-3"
-          placeholder="Enter your email"
-          required
-        />
-        {formik.touched.email && formik.errors.email ? (
-          <p className="text-red-500 mb-4">Email in correct format</p>
-        ) : (
-          ""
-        )}
-        <label htmlFor="password" className="text-left">
-          Password
-        </label>
-        <div className="relative">
+    <section className="background flex flex-col justify-center items-center self-stretch gap-8 relative">
+      <div className="w-1/3 h-2/4 flex flex-col justify-center items-center gap-2 rounded bg-white absolute">
+        <h1 className="text-3xl font-bold">Login to your account</h1>
+        <form
+          onSubmit={formik.handleSubmit}
+          id="formLogin"
+          className="w-80 flex flex-col gap-2"
+        >
+          <label htmlFor="email" className="text-left">
+            Email
+          </label>
           <input
-            type={showPassword ? "text" : "password"}
-            id="password"
-            {...formik.getFieldProps("password")}
-            className="w-full border rounded p-2"
-            placeholder="Enter your password"
+            type="text"
+            id="email"
+            {...formik.getFieldProps("email")}
+            className="border rounded p-2 mb-3"
+            placeholder="Enter your email"
             required
           />
-          <button
-            className="absolute top-2.5 right-2"
-            onClick={(e) => {
-              e.preventDefault();
-              setShowPassword(!showPassword);
-            }}
-          >
-            <img src={showPassword ? eye : eyeClose} alt="icon-eye" />
-          </button>
-          {formik.touched.password && formik.errors.password ? (
-            <p className="text-red-500 mb-4">Password do not match</p>
+          {formik.touched.email && formik.errors.email ? (
+            <p className="text-red-500 mb-4">Email in correct format</p>
           ) : (
             ""
           )}
-        </div>
-        <a className="text-right text-blue-500 underline" href="#">
-          Forgot password ?
-        </a>
-        <button
-          className="bg-pink-500 text-white rounded p-2"
-          disabled={!formik.isValid || !formik.dirty}
-        >
-          Login Now
-        </button>
-      </form>
+          <label htmlFor="password" className="text-left">
+            Password
+          </label>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              {...formik.getFieldProps("password")}
+              className="w-full border rounded p-2"
+              placeholder="Enter your password"
+              required
+            />
+            <button
+              className="absolute top-2.5 right-2"
+              onClick={(e) => {
+                e.preventDefault();
+                setShowPassword(!showPassword);
+              }}
+            >
+              <img src={showPassword ? eye : eyeClose} alt="icon-eye" />
+            </button>
+            {formik.touched.password && formik.errors.password ? (
+              <p className="text-red-500 mb-4">Password do not match</p>
+            ) : (
+              ""
+            )}
+          </div>
+          <button
+            className="bg-pink-500 text-white rounded p-2"
+            disabled={!formik.isValid || !formik.dirty}
+          >
+            Login Now
+          </button>
+        </form>
+      </div>
     </section>
   );
-}
+};
 
 export default LoginPage;
