@@ -3,9 +3,11 @@ import TextArea from "antd/es/input/TextArea";
 import ButtonUI from "../../../components/button";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { PlusOutlined } from "@ant-design/icons";
 import { createMovieAPI } from "../../../redux/services/movieAPI";
 import { useForm, Controller } from "react-hook-form";
+import { movieValidationSchema } from "../../../utils/validations";
 import {
   Form,
   Input,
@@ -16,8 +18,6 @@ import {
   Space,
   InputNumber,
 } from "antd";
-import { movieValidationSchema } from "../../../utils/validations";
-import { yupResolver } from "@hookform/resolvers/yup";
 
 function CreateMovieManagement() {
   const [componentSize, setComponentSize] = useState("default");
@@ -45,23 +45,24 @@ function CreateMovieManagement() {
       releaseDate: null,
       cast: "",
       trailer: "",
-      imageUrl: [],
+      image: [],
       rating: 0,
     },
   });
 
   const onSubmit = async (values) => {
-    
     const payload = {
       ...values,
-      releaseDate: moment(values.releaseDate).format("YYYY-MM-DD"),
-      imageUrl:
-        values.imageUrl && values.imageUrl.length > 0
-          ? values.imageUrl[0].originFileObj
+      releaseDate: values.releaseDate
+        ? moment(values.releaseDate).format("YYYY-MM-DD")
+        : null,
+      image:
+        values.image && values.image.length > 0
+          ? values.image[0].originFileObj
           : null,
     };
 
-    console.log(payload, "payload")
+    console.log(payload, "payload");
 
     try {
       const response = await createMovieAPI(payload);
@@ -70,9 +71,10 @@ function CreateMovieManagement() {
 
       toast.success("Add movie successfully");
       reset();
+      navigator("/movie-management")
     } catch (error) {
+      console.error("API call failed", error);
       toast.error("Add movie failed");
-      throw error;
     }
   };
 
@@ -123,32 +125,29 @@ function CreateMovieManagement() {
               getValueFromEvent={normFile}
             >
               <Controller
-                name="imageUrl"
+                name="image"
                 control={control}
-                render={({ field: { onChange, value } }) => {
-                  return (
-                    <Upload
-                      action="/upload.do"
-                      beforeUpload={() => false}
-                      onChange={(info) => {
-                        onChange(info.fileList);
-                      }}
-                      fileList={value || []}
-                      listType="picture-card"
-                    >
-                      <div>
-                        <PlusOutlined />
-                        <div style={{ marginTop: 8 }}>Upload</div>
-                      </div>
-                    </Upload>
-                  );
-                }}
+                render={({ field: { onChange, value } }) => (
+                  <Upload
+                    beforeUpload={() => false}
+                    onChange={(info) => {
+                      onChange(info.fileList);
+                    }}
+                    fileList={value || []}
+                    listType="picture-card"
+                  >
+                    <div>
+                      <PlusOutlined />
+                      <div style={{ marginTop: 8 }}>Upload</div>
+                    </div>
+                  </Upload>
+                )}
                 rules={{
-                  required: true,
+                  required: "Image is required",
                 }}
               />
-              {errors.imageUrl && (
-                <p className="text-red-500 mb-4">{errors.imageUrl.message}</p>
+              {errors.image && (
+                <p className="text-red-500 mb-4">{errors.image.message}</p>
               )}
             </Form.Item>
           </Col>

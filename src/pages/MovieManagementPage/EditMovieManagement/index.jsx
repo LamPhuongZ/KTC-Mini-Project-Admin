@@ -1,6 +1,3 @@
-import moment from "moment";
-import TextArea from "antd/es/input/TextArea";
-import ButtonUI from "../../../components/button";
 import { toast } from "react-toastify";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { PlusOutlined } from "@ant-design/icons";
@@ -22,15 +19,20 @@ import {
   Input,
   Space,
 } from "antd";
+import moment from "moment";
+import TextArea from "antd/es/input/TextArea";
+import ButtonUI from "../../../components/button";
 
 function EditMovieManagement() {
   const [componentSize, setComponentSize] = useState("default");
   const [fileList, setFileList] = useState([]);
   const { movieId } = useParams();
   const navigate = useNavigate();
+
   const onFormLayoutChange = ({ size }) => {
     setComponentSize(size);
   };
+
   const normFile = (e) => {
     if (Array.isArray(e)) {
       return e;
@@ -52,7 +54,7 @@ function EditMovieManagement() {
       releaseDate: moment().format("YYYY-MM-DD"),
       cast: "",
       trailer: "",
-      imageUrl: [],
+      image: [],
       rating: 0,
     },
   });
@@ -65,10 +67,16 @@ function EditMovieManagement() {
     const payload = {
       ...values,
       releaseDate: moment(values.releaseDate).format("YYYY-MM-DD"),
-      imageUrl: fileList[0]?.originFileObj || fileList[0]?.url,
+      image: fileList[0]?.originFileObj || fileList[0]?.url,
     };
+
+    console.log(payload);
+
     try {
-      await updateMovieAPI(payload);
+      const response = await updateMovieAPI(movieId, payload);
+
+      console.log("Update: ", response);
+
       toast.success("Movie update successful");
       reset();
       navigate("/movie-management");
@@ -90,7 +98,7 @@ function EditMovieManagement() {
         setValue("name", response.data.name),
           setValue("description", response.data.description),
           setValue("trailer", response.data.trailer),
-          setValue("imageUrl", response.data.imageUrl),
+          setValue("image", response.data.imageUrl),
           setValue("cast", response.data.cast),
           setValue("releaseDate", releaseDate._i),
           setValue("rating", response.data.rating),
@@ -157,7 +165,7 @@ function EditMovieManagement() {
               getValueFromEvent={normFile}
             >
               <Controller
-                name="imageUrl"
+                name="image"
                 control={control}
                 render={({ field }) => {
                   return (
@@ -187,8 +195,8 @@ function EditMovieManagement() {
                   required: true,
                 }}
               />
-              {errors.imageUrl && (
-                <p className="text-red-500 mb-4">{errors.imageUrl.message}</p>
+              {errors.image && (
+                <p className="text-red-500 mb-4">{errors.image.message}</p>
               )}
             </Form.Item>
           </Col>

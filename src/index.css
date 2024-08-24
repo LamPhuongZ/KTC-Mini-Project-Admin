@@ -10,11 +10,15 @@
   height: 100vh;
 }
 
-.custom-row-height .MuiDataGrid-row {
-  min-height: 100px !important;
+.custom-table .ant-table {
+  @apply bg-gray-100 border border-gray-300 h-2/4;
 }
 
-.custom-image-style .MuiDataGrid-cell {
-    min-height: 400px !important; 
-  }
-  
+.custom-table .ant-table-thead > tr > th {
+  @apply bg-gray-200 text-gray-700 font-bold;
+}
+
+.custom-table .ant-table-tbody > tr > td {
+  @apply border-t border-gray-300 h-2/4;
+}
+

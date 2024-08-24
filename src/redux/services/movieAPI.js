@@ -2,16 +2,25 @@ import instance from "../../config/index";
 
 export const getMovieAllAPI = async () => {
   try {
-    const response = await instance.get(`/api/movies`);
-
-    console.log(response.data);
-
-    // return {
-    //   items: response.data.data,
-    //   // totalCount: response.data.data.totalCount,
-    // };
-
+    const response = await instance.get(`/api/movies/all`);
     return response.data;
+  } catch (error) {
+    console.log("API call failed", error);
+    throw error;
+  }
+};
+
+export const getMoviePaginationAPI = async (page, pageSize) => {
+  try {
+    const response = await instance.get(
+      `/api/movies?page=${page}&size=${pageSize}`
+    );
+    return {
+      items: response.data,
+      totalCount: response.data.data.totalCount,
+    };
+
+    // return response.data;
   } catch (error) {
     console.log("API call failed", error);
     throw error;
@@ -36,20 +45,21 @@ export const createMovieAPI = async (movie) => {
     const formData = new FormData();
 
     for (let key in movie) {
-      if (movie[key] !== null && key !== "imageUrl") {
+      if (movie[key] !== null && key !== "image") {
         formData.append(key, movie[key]);
       }
     }
 
-    if (movie.imageUrl && movie.imageUrl instanceof File) {
-      formData.append("imageUrl", movie.imageUrl);
+    if (movie.image && movie.image instanceof File) {
+      formData.append("image", movie.image);
     }
 
-    const response = await instance.post(`/api/movies`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const response = await instance.post(`/api/movies`, formData);
 
-    console.log(formData);
+    // Debugging: Inspect FormData contents
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
 
     return response;
   } catch (error) {
@@ -81,23 +91,32 @@ export const getMovieByNameAPI = async (movieName) => {
 };
 
 // update movie with pictures
-export const updateMovieAPI = async (movie) => {
+export const updateMovieAPI = async (movieId, movie) => {
   try {
     const formData = new FormData();
 
     for (let key in movie) {
-      if (movie[key] !== null && key !== "imageUrl") {
+      if (movie[key] !== null && key !== "image") {
         formData.append(key, movie[key]);
       }
     }
 
-    if (movie.imageUrl && movie.imageUrl instanceof File) {
-      formData.append("imageUrl", movie.imageUrl);
+    if (movie.image && movie.image instanceof File) {
+      formData.append("image", movie.image);
     }
 
-    const response = await instance.post(`/api/movies`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+    const response = await instance.put(`/api/movies?id=${movieId}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
+
+    // Debugging: Inspect FormData contents
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
+    console.log("Update API: ", response);
 
     return response;
   } catch (error) {

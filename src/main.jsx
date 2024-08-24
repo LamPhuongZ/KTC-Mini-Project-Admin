@@ -6,7 +6,6 @@ import { Provider } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import store, { persistor } from "./redux/store.js";
-// import { StrictMode } from "react";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -16,9 +15,4 @@ root.render(
     </PersistGate>
     <ToastContainer position="top-center" />
   </Provider>
-
-  // <StrictMode>
-  //   <App />
-  //   <ToastContainer position="top-center" />
-  // </StrictMode>
 );

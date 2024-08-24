@@ -1,13 +1,13 @@
-// MovieManagementPage.jsx
 import { toast } from "react-toastify";
-import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
+import { Space, Table } from "antd";
 import { useState, useEffect } from "react";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
   deleteMovieAPI,
   getMovieAllAPI,
   getMovieByNameAPI,
+  // getMoviePaginationAPI,
 } from "../../redux/services/movieAPI";
 import ButtonUI from "../../components/button";
 import SearchForm from "../../components/SearchForm";
@@ -16,85 +16,84 @@ function MovieManagementPage() {
   const navigate = useNavigate();
   const [movies, setMovies] = useState([]);
   const [searchText, setSearchText] = useState("");
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
 
   const columns = [
-    { field: "id", headerName: "#", width: 120, headerClassName: "font-bold" },
     {
-      field: "imageUrl",
-      headerName: "Image",
-      width: 200,
-      renderCell: (params) => (
+      title: "#",
+      dataIndex: "id",
+      key: "id",
+      width: 100  
+    },
+    {
+      title: "Image",
+      dataIndex: "imageUrl",
+      key: "imageUrl",
+      render: (imageUrl) => (
         <img
-          src={params.row.imageUrl}
-          alt={params.row.name}
-          className="w-24 h-24 object-cover"
+          src={imageUrl}
+          alt="Movie Poster"
+          style={{ width: 100, height: 100, objectFit: "cover" }}
         />
       ),
-      headerClassName: "font-bold",
     },
     {
-      field: "name",
-      headerName: "Movie Name",
-      width: 200,
-      headerClassName: "font-bold",
+      title: "Movie Name",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      field: "description",
-      headerName: "Description",
-      width: 300,
-      headerClassName: "font-bold",
-      renderCell: (params) => (
-        <span>
-          {params.row.description.length > 100
-            ? `${params.row.description.slice(0, 100)}...`
-            : params.row.description}
-        </span>
-      ),
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+      width: 400
     },
     {
-      field: "rating",
-      headerName: "Rating",
-      width: 100,
-      headerClassName: "font-bold",
+      title: "Rating",
+      key: "rating",
+      dataIndex: "rating",
+      width: 100
     },
     {
-      field: "releaseDate",
-      headerName: "Release Date",
-      width: 200,
-      headerClassName: "font-bold",
+      title: "Release Date",
+      dataIndex: "releaseDate",
+      key: "releaseDate",
+      width: 150,
     },
     {
-      field: "action",
-      headerName: "Actions",
-      width: 200,
-      headerClassName: "font-bold",
-      renderCell: (params) => (
-        <div className="flex items-center">
-          <button
-            onClick={() => onNavigateToEditMovie(params.row.id)}
-            className="text-green-500 text-2xl mr-4 hover:opacity-80 transition"
-          >
-            <EditOutlined />
-          </button>
-          <button
-            onClick={() => onDeleteMovie(params.row.id)}
-            className="text-red-500 text-2xl hover:opacity-80 transition"
-          >
-            <DeleteOutlined />
-          </button>
-        </div>
+      title: "Action",
+      key: "action",
+      render: (text, record) => (
+        <Space size="middle">
+          <div className="flex items-center">
+            <button
+              onClick={() => onNavigateToEditMovie(record.id)}
+              className="text-green-500 text-2xl mr-4 hover:opacity-80 transition"
+            >
+              <EditOutlined />
+            </button>
+            <button
+              onClick={() => onDeleteMovie(record.id)}
+              className="text-red-500 text-2xl hover:opacity-80 transition"
+            >
+              <DeleteOutlined />
+            </button>
+          </div>
+        </Space>
       ),
     },
   ];
 
   const fetchMovies = async () => {
     try {
+      // const response = await getMoviePaginationAPI(page, pageSize);
+      // setMovies(response.items.data.movies);
+      // setTotalRows(response.totalCount);
+
       const response = await getMovieAllAPI();
       setMovies(response.data);
-      // setTotalRows(response.totalCount);
     } catch (error) {
       toast.error("Failed to fetch movies");
       console.error(error);
@@ -106,8 +105,10 @@ function MovieManagementPage() {
       if (movieName.trim()) {
         const response = await getMovieByNameAPI(movieName);
         setMovies(response.data);
-        // setTotalRows(response.data.length);
+        setTotalRows(response.totalCount);
+        setPage(1); // Reset trang về 1 khi thực hiện tìm kiếm
       } else {
+        // fetchMovies(page, pageSize);
         fetchMovies();
       }
     } catch (error) {
@@ -124,6 +125,7 @@ function MovieManagementPage() {
     try {
       await deleteMovieAPI(movieId);
       toast.success("Movie deleted successfully!");
+      // fetchMovies(page, pageSize);
       fetchMovies();
     } catch (error) {
       toast.error("Movie deletion failed");
@@ -135,9 +137,21 @@ function MovieManagementPage() {
     navigate(`/movie-management/edit/${movieId}`);
   };
 
+  // useEffect(() => {
+  //   fetchMovies(page, pageSize);
+  // }, [page, pageSize]);
+
   useEffect(() => {
     fetchMovies();
   }, []);
+
+  // useEffect(() => {
+  //   if (searchText) {
+  //     fetchSearchMovie(searchText);
+  //   } else {
+  //     fetchMovies(page, pageSize);
+  //   }
+  // }, [page, pageSize, searchText]);
 
   useEffect(() => {
     if (searchText) {
@@ -146,15 +160,6 @@ function MovieManagementPage() {
       fetchMovies();
     }
   }, [searchText]);
-
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
-  };
-
-  const handlePageSizeChange = (newPageSize) => {
-    setPageSize(newPageSize);
-    setPage(0);
-  };
 
   const onChangeInput = (e) => {
     setSearchText(e.target.value);
@@ -177,19 +182,24 @@ function MovieManagementPage() {
         />
       </div>
 
-      <div className="w-full h-[630px]">
-        <DataGrid
-          className="custom-row-height"
-          rows={movies}
-          getRowId={(row) => row.id}
+      <div className="w-full h-[300px]">
+        <Table
           columns={columns}
-          pagination
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          page={page}
-          pageSize={pageSize}
-          rowCount={totalRows}
-          pageSizeOptions={[5, 10, 25, 50]}
+          dataSource={movies}
+          pagination={{
+            current: page,
+            pageSize: pageSize,
+            total: totalRows,
+            showSizeChanger: true,
+            pageSizeOptions: ["5", "10", "20", "50"],
+            onChange: (newPage, newPageSize) => {
+              setPage(newPage);
+              setPageSize(newPageSize);
+            },
+          }}
+          rowKey="id"
+          className="custom-table"
+          scroll={{ y: 400 }}
         />
       </div>
     </div>
