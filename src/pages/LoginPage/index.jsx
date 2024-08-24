@@ -1,41 +1,53 @@
-import * as Yup from "yup";
 import eye from "../../assets/icons/eye.svg";
 import eyeClose from "../../assets/icons/eyeClose.svg";
+import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { useFormik } from "formik";
-import { regexPassword } from "../../utils";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useDispatch, useSelector } from "react-redux";
+import { Navigate, useSearchParams } from "react-router-dom";
+import { loginValidationSchema } from "../../utils/validations";
+import { loginRequestAction } from "../../redux/slices/userAdminSlice";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
 
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-      password: "",
-    },
-    validationSchema: Yup.object({
-      email: Yup.string()
-        .email("Invalid email address")
-        .required("Email is required"),
-      password: Yup.string()
-        .min(8, "Password must be at least 8 characters")
-        .matches(
-          regexPassword,
-          "Password must contain one uppercase, one lowercase, one number, and one special character"
-        )
-        .required("Password is required"),
-    }),
-    onSubmit: (values) => {
-      console.log("Form values:", values);
-    },
+
+  const { token } = useSelector((state) => {
+    return state.userReducer;
   });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isDirty },
+  } = useForm({
+    resolver: yupResolver(loginValidationSchema),
+    email: "",
+    password: "",
+  });
+
+  const onSubmit = async (values) => {
+    dispatch(
+      loginRequestAction({
+        email: values.email,
+        password: values.password,
+      })
+    );
+  };
+
+  if (token) {
+    const url = searchParams.get("redirectUrl") || "/";
+    return <Navigate to={url} />;
+  }
 
   return (
     <section className="background flex flex-col justify-center items-center self-stretch gap-8 relative">
       <div className="w-1/3 h-2/4 flex flex-col justify-center items-center gap-2 rounded bg-white absolute">
         <h1 className="text-3xl font-bold">Login to your account</h1>
         <form
-          onSubmit={formik.handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
           id="formLogin"
           className="w-80 flex flex-col gap-2"
         >
@@ -45,15 +57,13 @@ const LoginPage = () => {
           <input
             type="text"
             id="email"
-            {...formik.getFieldProps("email")}
+            {...register("email")}
             className="border rounded p-2 mb-3"
             placeholder="Enter your email"
             required
           />
-          {formik.touched.email && formik.errors.email ? (
-            <p className="text-red-500 mb-4">Email in correct format</p>
-          ) : (
-            ""
+          {errors.email && (
+            <p className="text-red-500 mb-4">{errors.email.message}</p>
           )}
           <label htmlFor="password" className="text-left">
             Password
@@ -62,7 +72,7 @@ const LoginPage = () => {
             <input
               type={showPassword ? "text" : "password"}
               id="password"
-              {...formik.getFieldProps("password")}
+              {...register("password")}
               className="w-full border rounded p-2"
               placeholder="Enter your password"
               required
@@ -76,15 +86,13 @@ const LoginPage = () => {
             >
               <img src={showPassword ? eye : eyeClose} alt="icon-eye" />
             </button>
-            {formik.touched.password && formik.errors.password ? (
-              <p className="text-red-500 mb-4">Password do not match</p>
-            ) : (
-              ""
+            {errors.password && (
+              <p className="text-red-500 mb-4">{errors.password.message}</p>
             )}
           </div>
           <button
             className="bg-pink-500 text-white rounded p-2"
-            disabled={!formik.isValid || !formik.dirty}
+            disabled={!isValid || !isDirty}
           >
             Login Now
           </button>

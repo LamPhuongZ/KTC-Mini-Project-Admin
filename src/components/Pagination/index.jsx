@@ -1,10 +1,10 @@
 import PropTypes from "prop-types";
 
 Pagination.propTypes = {
-  totalPosts: PropTypes.number.isRequired,
-  postsPerPage: PropTypes.number.isRequired,
-  setCurrentPage: PropTypes.number.isRequired,
-  currentPage: PropTypes.number.isRequired,
+  totalPosts: PropTypes.number,
+  postsPerPage: PropTypes.number,
+  setCurrentPage: PropTypes.number,
+  currentPage: PropTypes.number,
 };
 
 function Pagination({ totalPosts, postsPerPage, setCurrentPage, currentPage }) {

@@ -1,7 +1,6 @@
 import {
   createAsyncThunk,
   createSlice,
-  isRejectedWithValue,
 } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { loginRequest } from "../services/loginAPI";
@@ -11,17 +10,8 @@ export const loginRequestAction = createAsyncThunk(
   async (values) => {
     try {
       const userInfo = await loginRequest(values);
-
-      //trường hợp ko đủ quyền truy cập
-      if (userInfo.maLoaiNguoiDung !== "QuanTri") {
-        toast.error("Không đủ quyền truy cập");
-        throw new Error("Không đủ quyền truy cập");
-      }
-
-      const { accessToken } = userInfo;
-      localStorage.setItem("accessToken", accessToken);
-
-      //trường hợp đủ quyền truy cập
+      const { token } = userInfo;
+      localStorage.setItem("token", token);
       return userInfo;
     } catch (error) {
       toast.error(error);
@@ -31,7 +21,7 @@ export const loginRequestAction = createAsyncThunk(
 );
 
 const initialState = {
-  user: null,
+  token: null,
   isLoading: false,
   error: "",
 };
@@ -40,8 +30,8 @@ const userReducer = createSlice({
   name: "userAdminSlice",
   initialState,
   reducers: {
-    logout: (state, action) => {
-      state.user = null;
+    logout: (state) => {
+      state.token = null;
     },
   },
   extraReducers: (builder) => {
@@ -50,7 +40,7 @@ const userReducer = createSlice({
       state.error = "";
     });
     builder.addCase(loginRequestAction.fulfilled, (state, action) => {
-      state.user = action.payload;
+      state.token = action.payload.token;
       state.isLoading = false;
     });
     builder.addCase(loginRequestAction.rejected, (state, action) => {

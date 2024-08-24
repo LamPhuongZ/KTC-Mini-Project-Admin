@@ -1,188 +1,278 @@
-import dayjs from "dayjs";
-import ButtonUI from "../../../components/Button";
+import moment from "moment";
+import TextArea from "antd/es/input/TextArea";
+import ButtonUI from "../../../components/button";
 import { toast } from "react-toastify";
-import { useFormik } from "formik";
+import { useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
+import { createMovieAPI } from "../../../redux/services/movieAPI";
+import { useForm, Controller } from "react-hook-form";
 import {
   Form,
   Input,
-  InputNumber,
   DatePicker,
-  Switch,
   Upload,
   Row,
   Col,
   Space,
+  InputNumber,
 } from "antd";
+import { movieValidationSchema } from "../../../utils/validations";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 function CreateMovieManagement() {
-  const formik = useFormik({
-    initialValues: {
-      tenPhim: "",
-      biDanh: "",
+  const [componentSize, setComponentSize] = useState("default");
+  const onFormLayoutChange = ({ size }) => {
+    setComponentSize(size);
+  };
+
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList || [];
+  };
+
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(movieValidationSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      releaseDate: null,
+      cast: "",
       trailer: "",
-      hinhAnh: "",
-      moTa: "",
-      ngayKhoiChieu: "",
-      danhGia: 0,
-      hot: false,
-      dangChieu: false,
-      sapChieu: false,
-    },
-    onSubmit: async (values) => {
-      try {
-        // Xử lý gửi dữ liệu
-        toast.success("Thêm phim thành công");
-      } catch (error) {
-        toast.error("Thêm phim không thành công");
-        throw error;
-      }
+      imageUrl: [],
+      rating: 0,
     },
   });
 
-  return (
-    <>
-      <h4 className="text-center mb-6 text-lg font-bold">Add Movie</h4>
+  const onSubmit = async (values) => {
+    
+    const payload = {
+      ...values,
+      releaseDate: moment(values.releaseDate).format("YYYY-MM-DD"),
+      imageUrl:
+        values.imageUrl && values.imageUrl.length > 0
+          ? values.imageUrl[0].originFileObj
+          : null,
+    };
 
+    console.log(payload, "payload")
+
+    try {
+      const response = await createMovieAPI(payload);
+
+      console.log(response);
+
+      toast.success("Add movie successfully");
+      reset();
+    } catch (error) {
+      toast.error("Add movie failed");
+      throw error;
+    }
+  };
+
+  return (
+    <section className="flex flex-col w-full justify-center items-center">
+      <h4 className="text-center mb-6 text-lg font-bold">Add Movie</h4>
       <Form
+        labelCol={{
+          span: 4,
+        }}
+        wrapperCol={{
+          span: 14,
+        }}
         layout="horizontal"
-        onFinish={formik.handleSubmit}
-        style={{ maxWidth: 800, margin: "auto" }}
+        initialValues={{
+          size: componentSize,
+        }}
+        onValuesChange={onFormLayoutChange}
+        size={componentSize}
+        style={{
+          maxWidth: 600,
+          paddingLeft: "100px",
+        }}
+        onFinish={handleSubmit(onSubmit)}
       >
         <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Tên Phim">
-              <Input
-                name="tenPhim"
-                value={formik.values.tenPhim}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
+          <Col span={24}>
+            <Form.Item label="Name">
+              <Controller
+                name="name"
+                control={control}
+                render={({ onChange, field }) => {
+                  return <Input onChange={onChange} {...field} />;
+                }}
+                rules={{
+                  required: true,
+                }}
               />
+              {errors.name && (
+                <p className="text-red-500 mb-4">{errors.name.message}</p>
+              )}
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item label="Bí Danh">
-              <Input
-                name="biDanh"
-                value={formik.values.biDanh}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Trailer">
-              <Input
-                name="trailer"
-                value={formik.values.trailer}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
+          <Col span={24}>
             <Form.Item
-              label="Hình Ảnh"
+              label="Image"
               valuePropName="fileList"
-              getValueFromEvent={(e) => e.fileList}
+              getValueFromEvent={normFile}
             >
-              <Upload
-                name="hinhAnh"
-                listType="picture-card"
-                onChange={(info) =>
-                  formik.setFieldValue("hinhAnh", info.fileList)
-                }
-              >
-                <div>
-                  <PlusOutlined />
-                  <div style={{ marginTop: 8 }}>Upload</div>
-                </div>
-              </Upload>
+              <Controller
+                name="imageUrl"
+                control={control}
+                render={({ field: { onChange, value } }) => {
+                  return (
+                    <Upload
+                      action="/upload.do"
+                      beforeUpload={() => false}
+                      onChange={(info) => {
+                        onChange(info.fileList);
+                      }}
+                      fileList={value || []}
+                      listType="picture-card"
+                    >
+                      <div>
+                        <PlusOutlined />
+                        <div style={{ marginTop: 8 }}>Upload</div>
+                      </div>
+                    </Upload>
+                  );
+                }}
+                rules={{
+                  required: true,
+                }}
+              />
+              {errors.imageUrl && (
+                <p className="text-red-500 mb-4">{errors.imageUrl.message}</p>
+              )}
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={16}>
           <Col span={24}>
-            <Form.Item label="Mô tả">
-              <Input.TextArea
-                name="moTa"
-                value={formik.values.moTa}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                rows={4}
+            <Form.Item label="Trailer">
+              <Controller
+                name="trailer"
+                control={control}
+                render={({ onChange, field }) => {
+                  return <Input onChange={onChange} {...field} />;
+                }}
+                rules={{
+                  required: true,
+                }}
               />
+              {errors.trailer && (
+                <p className="text-red-500 mb-4">{errors.trailer.message}</p>
+              )}
+            </Form.Item>
+          </Col>
+          <Col span={24}>
+            <Form.Item label="Cast">
+              <Controller
+                name="cast"
+                control={control}
+                render={({ onChange, field }) => {
+                  return <Input onChange={onChange} {...field} />;
+                }}
+                rules={{
+                  required: true,
+                }}
+              />
+              {errors.cast && (
+                <p className="text-red-500 mb-4">{errors.cast.message}</p>
+              )}
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col span={24}>
+            <Form.Item label="Description">
+              <Controller
+                name="description"
+                control={control}
+                render={({ onChange, field }) => {
+                  return (
+                    <TextArea
+                      showCount
+                      rows={8}
+                      onChange={onChange}
+                      {...field}
+                    />
+                  );
+                }}
+                rules={{
+                  required: true,
+                }}
+              />
+              {errors.description && (
+                <p className="text-red-500 mb-4">
+                  {errors.description.message}
+                </p>
+              )}
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="Ngày Khởi Chiếu">
-            <Space direction="vertical" size={12}>
-                <DatePicker
-                  format="DD/MM/YYYY"
-                  name="ngayKhoiChieu"
-                  onChange={(date, dateString) =>
-                    formik.setFieldValue("ngayKhoiChieu", dateString)
-                  }
-                  value={
-                    formik.values.ngayKhoiChieu
-                      ? dayjs(formik.values.ngayKhoiChieu, "DD/MM/YYYY")
-                      : null
-                  }
-                />
-              </Space>
+            <Form.Item
+              label="Release Date"
+              labelCol={{
+                style: {
+                  marginRight: 5,
+                },
+              }}
+              rules={{
+                required: true,
+              }}
+            >
+              <Controller
+                name="releaseDate"
+                control={control}
+                render={({ field: { onChange, value } }) => {
+                  return (
+                    <Space direction="vertical" size={12}>
+                      <DatePicker
+                        format="YYYY-MM-DD"
+                        onChange={(date) => onChange(date)}
+                        value={value ? moment(value) : null}
+                      />
+                    </Space>
+                  );
+                }}
+                rules={{
+                  required: true,
+                }}
+              />
+              {errors.releaseDate && (
+                <p className="text-red-500 mb-4">
+                  {errors.releaseDate.message}
+                </p>
+              )}
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Đánh Giá">
-              <InputNumber
-                name="danhGia"
-                value={formik.values.danhGia}
-                onChange={(value) => formik.setFieldValue("danhGia", value)}
+            <Form.Item label="Rate">
+              <Controller
+                name="rating"
+                control={control}
+                render={({ onChange, field }) => {
+                  return <InputNumber onChange={onChange} {...field} />;
+                }}
               />
+              {errors.rating && (
+                <p className="text-red-500 mb-4">{errors.rating.message}</p>
+              )}
             </Form.Item>
           </Col>
         </Row>
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item label="Hot" valuePropName="checked">
-              <Switch
-                name="hot"
-                checked={formik.values.hot}
-                onChange={(checked) => formik.setFieldValue("hot", checked)}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label="Đang Chiếu" valuePropName="checked">
-              <Switch
-                name="dangChieu"
-                checked={formik.values.dangChieu}
-                onChange={(checked) =>
-                  formik.setFieldValue("dangChieu", checked)
-                }
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label="Sắp Chiếu" valuePropName="checked">
-              <Switch
-                name="sapChieu"
-                checked={formik.values.sapChieu}
-                onChange={(checked) =>
-                  formik.setFieldValue("sapChieu", checked)
-                }
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Form.Item>
-          <ButtonUI type="submit" title="Thêm Phim" />
-        </Form.Item>
+        <ButtonUI type="submit" title="Add Movie" />
       </Form>
-    </>
+    </section>
   );
 }
 

@@ -3,9 +3,18 @@
 @tailwind utilities;
 
 .background {
-    background-image: url('../src/assets/images/auth-background.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    width: 100%;
-    height: 100vh;
+  background-image: url("../src/assets/images/auth-background.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  height: 100vh;
 }
+
+.custom-row-height .MuiDataGrid-row {
+  min-height: 100px !important;
+}
+
+.custom-image-style .MuiDataGrid-cell {
+    min-height: 400px !important; 
+  }
+  

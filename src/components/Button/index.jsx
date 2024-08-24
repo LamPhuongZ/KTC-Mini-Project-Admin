@@ -2,12 +2,12 @@ import PropTypes from "prop-types";
 
 ButtonUI.propTypes = {
   title: PropTypes.string.isRequired,
-  bgColor: PropTypes.string.isRequired,
-  color: PropTypes.string.isRequired,
-  borderColor: PropTypes.string.isRequired,
-  mb: PropTypes.number.isRequired,
-  width: PropTypes.number.isRequired,
-  onClick: PropTypes.func.isRequired,
+  bgColor: PropTypes.string,
+  color: PropTypes.string,
+  borderColor: PropTypes.string,
+  mb: PropTypes.number,
+  width: PropTypes.string,
+  onClick: PropTypes.func,
 };
 
 function ButtonUI({
@@ -16,7 +16,7 @@ function ButtonUI({
   color = "rgb(5, 122, 206)",
   borderColor = "rgb(5, 122, 206)",
   mb = 0,
-  width = 100,
+  width = "100%",
   onClick,
 }) {
   return (

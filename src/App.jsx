@@ -4,7 +4,6 @@ import HomePage from "./pages/HomePage";
 import UserManagementPage from "./pages/UserManagementPage";
 import CreateUserManagement from "./pages/UserManagementPage/CreateUserManagement";
 import EditUserManagement from "./pages/UserManagementPage/EditUserManagement";
-import CreateBookingManagement from "./pages/BookingManagementPage/CreateBookingManagement";
 import BookingManagementPage from "./pages/BookingManagementPage";
 import MovieManagementPage from "./pages/MovieManagementPage";
 import CreateMovieManagement from "./pages/MovieManagementPage/CreateMovieManagement";
@@ -13,7 +12,7 @@ import LoginPage from "./pages/LoginPage";
 
 function App() {
   return (
-    <div>
+    <>
       <BrowserRouter>
         <Routes>
           {/* Route trang chủ */}
@@ -25,27 +24,26 @@ function App() {
             <Route path="user-management">
               <Route index element={<UserManagementPage />} />
               <Route path="create" element={<CreateUserManagement />} />
-              <Route path="edit/:taiKhoan" element={<EditUserManagement />} />
+              <Route path="edit/:email" element={<EditUserManagement />} />
             </Route>
 
             {/* Danh sách phim - Tạo Phim - Edit Phim */}
             <Route path="movie-management">
               <Route index element={<MovieManagementPage />} />
               <Route path="create" element={<CreateMovieManagement />} />
-              <Route path="edit/:maPhim" element={<EditMovieManagement />} />
+              <Route path="edit/:movieId" element={<EditMovieManagement />} />
             </Route>
 
             {/* Tạo Lịch Chiếu */}
             <Route path="booking-management">
               <Route index element={<BookingManagementPage />} />
-              <Route path="create" element={<CreateBookingManagement />} />
             </Route>
           </Route>
 
-          {/* <Route path="login" element={<LoginPage />} /> */}
+          <Route path="login" element={<LoginPage />} />
         </Routes>
       </BrowserRouter>
-    </div>
+    </>
   );
 }
 

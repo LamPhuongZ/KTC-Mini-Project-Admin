@@ -1,69 +1,107 @@
 import instance from "../../config/index";
 
-export const getMovieAllAPI = async (payload) => {
+export const getMovieAllAPI = async () => {
   try {
-    let url = `/QuanLyPhim/LayDanhSachPhim`;
-    if (payload?.tenPhim) {
-      url += `&tenPhim=${payload.tenPhim}`;
-    }
+    const response = await instance.get(`/api/movies`);
 
-    const response = await instance.get(url);
-    return response.data.content;
+    console.log(response.data);
+
+    // return {
+    //   items: response.data.data,
+    //   // totalCount: response.data.data.totalCount,
+    // };
+
+    return response.data;
   } catch (error) {
-    error.response.data.content;
+    console.log("API call failed", error);
+    throw error;
   }
 };
 
-//API xoá phim
-export const deleteMovieAPI = async (maPhim) => {
+// delete movie
+export const deleteMovieAPI = async (movieId) => {
   try {
-    const response = await instance.delete(
-      `/QuanLyPhim/XoaPhim?MaPhim=${maPhim}`
-    );
+    const response = await instance.delete(`/api/movies/id?id=${movieId}`);
     // return true;
     return response;
   } catch (error) {
-    throw error.response.data.content;
+    console.log("API call failed", error);
+    throw error;
   }
 };
 
-//API thêm phim
+// create movie
 export const createMovieAPI = async (movie) => {
   try {
     const formData = new FormData();
+
     for (let key in movie) {
-      formData.append(key, movie[key]);
+      if (movie[key] !== null && key !== "imageUrl") {
+        formData.append(key, movie[key]);
+      }
     }
 
-    await instance.post(`/QuanLyPhim/ThemPhimUploadHinh`, formData);
+    if (movie.imageUrl && movie.imageUrl instanceof File) {
+      formData.append("imageUrl", movie.imageUrl);
+    }
+
+    const response = await instance.post(`/api/movies`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    console.log(formData);
+
+    return response;
   } catch (error) {
-    throw error.response.data.content;
+    console.log("API call failed", error);
+    throw error;
   }
 };
 
-//API lấy thông tin phim từ server để hiện thị ra
-export const getMovieInfoAPI = async (movieId) => {
+// get movie data by id
+export const getMovieByIdAPI = async (movieId) => {
   try {
-    const response = await instance.get(
-      `/QuanLyPhim/LayThongTinPhim?MaPhim=${movieId}`
-    );
-    return response.data.content;
+    const response = await instance.get(`/api/movies/id?id=${movieId}`);
+    return response.data;
   } catch (error) {
-    throw error.response.data.content;
+    console.log("API call failed", error);
+    throw error;
   }
 };
 
-//API cập nhật phim, upload hình ảnh
-export const updateMoiveAPI = async (movie) => {
+// get movie data by name
+export const getMovieByNameAPI = async (movieName) => {
+  try {
+    const response = await instance.get(`/api/movies/title?title=${movieName}`);
+    return response.data;
+  } catch (error) {
+    console.log("API call failed", error);
+    throw error;
+  }
+};
+
+// update movie with pictures
+export const updateMovieAPI = async (movie) => {
   try {
     const formData = new FormData();
+
     for (let key in movie) {
-      formData.append(key, movie[key]);
+      if (movie[key] !== null && key !== "imageUrl") {
+        formData.append(key, movie[key]);
+      }
     }
 
-    await instance.post(`/QuanLyPhim/CapNhatPhimUpload`, formData);
-    return true;
+    if (movie.imageUrl && movie.imageUrl instanceof File) {
+      formData.append("imageUrl", movie.imageUrl);
+    }
+
+    const response = await instance.post(`/api/movies`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return response;
   } catch (error) {
-    throw error.response.data.content;
+    console.log("API call failed", error);
+    throw error;
   }
 };

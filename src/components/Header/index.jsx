@@ -1,11 +1,27 @@
 import { DownOutlined } from "@ant-design/icons";
 import { Dropdown, Space } from "antd";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getMeAPI } from "../../redux/services/accountAPI";
+import { logout } from "../../redux/slices/userAdminSlice";
 
 function Header() {
-  // const { user } = useSelector((state) => state.userReducer);
+  const [user, setUser] = useState({});
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const getMe = async () => {
+      const response = await getMeAPI();
+      setUser(response);
+    };
+    getMe();
+  }, []);
+
+  const { token } = useSelector((state) => state.userReducer);
   const handleLogOut = () => {
+    dispatch(logout());
     // Handle logout here
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem("token");
   };
 
   const items = [
@@ -25,7 +41,7 @@ function Header() {
   return (
     <header className="z-[999] relative">
       <div className="min-w-[100px] flex m-0 p-0 relative">
-        {/* {user && ( */}
+        {token && (
           <Dropdown
             menu={{
               items,
@@ -33,12 +49,12 @@ function Header() {
           >
             <a onClick={(e) => e.preventDefault()}>
               <Space>
-                Username
+                {user.name}
                 <DownOutlined />
               </Space>
             </a>
           </Dropdown>
-        {/* )} */}
+        )}
       </div>
     </header>
   );

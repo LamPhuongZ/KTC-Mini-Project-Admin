@@ -2,12 +2,10 @@ import axiosClient from "../../config/index";
 
 export const loginRequest = async (payload) => {
   try {
-    const response = await axiosClient.post(
-      "/QuanLyNguoiDung/DangNhap",
-      payload
-    );
-    return response.data.content;
+    const response = await axiosClient.post(`/api/auth/admins/login`, payload);
+    return response.data;
   } catch (error) {
-    throw error.response.data.message;
+    console.log("API call failed", error);
+    throw error;
   }
 };

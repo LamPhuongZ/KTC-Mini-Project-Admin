@@ -42,9 +42,7 @@ function AdminTemplate() {
                 children: [
                   {
                     key: "1.1",
-                    label: (
-                      <Link to="/user-management">List User</Link>
-                    ),
+                    label: <Link to="/user-management">List User</Link>,
                   },
                 ],
               },
@@ -66,11 +64,7 @@ function AdminTemplate() {
                 children: [
                   {
                     key: "3.1",
-                    label: (
-                      <Link to="/booking-management/create">
-                        Create Showtime
-                      </Link>
-                    ),
+                    label: <Link to="/booking-management">List Booking</Link>,
                   },
                 ],
               },

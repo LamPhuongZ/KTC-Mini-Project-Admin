@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 
 SearchForm.propTypes = {
   placeholder: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
-  onChange: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
+  onChange: PropTypes.func,
 };
 
 function SearchForm({ placeholder, onClick, onChange }) {
@@ -12,7 +12,7 @@ function SearchForm({ placeholder, onClick, onChange }) {
     <div className="flex justify-center mt-4">
       <input
         onChange={onChange}
-        className="text-base p-1.5 mb-4 w-full h-8 border border-gray-300"
+        className="text-base p-1.5 mb-4 w-80 h-8 border border-gray-300"
         type="text"
         placeholder={placeholder}
       />

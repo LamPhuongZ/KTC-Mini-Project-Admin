@@ -9,12 +9,12 @@ AdminProtected.propTypes = {
 
 
 function AdminProtected({ children }) {
-  // const { user } = useSelector((state) => state.userReducer);
+  const { token } = useSelector((state) => state.userReducer);
 
   const { pathname } = useLocation();
-  // if (!user) {
-  //   return <Navigate to={`/login?redirectUrl=${pathname}`} replace />;
-  // }
+  if (!token) {
+    return <Navigate to={`/login?redirectUrl=${pathname}`} replace />;
+  }
   return children;
 }
 

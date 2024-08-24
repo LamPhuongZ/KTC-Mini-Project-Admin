@@ -1,10 +1,14 @@
-import { Fragment, useEffect, useState } from "react";
 import ButtonUI from "../../components/Button";
 import SearchForm from "../../components/SearchForm";
-import { Space, Table } from "antd";
-import { deleteAccountAPI, getAccountAllAPI } from "../../redux/services/accountAPI";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { Space, Table } from "antd";
+import { Fragment, useEffect, useState } from "react";
+import {
+  deleteAccountAPI,
+  getAccountAllAPI,
+} from "../../redux/services/accountAPI";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 function UserManagementPage() {
   const [accounts, setAccounts] = useState([]);
@@ -13,7 +17,9 @@ function UserManagementPage() {
   const getAccounts = async () => {
     try {
       const response = await getAccountAllAPI();
-      setAccounts(response.content);
+      console.log(response);
+
+      setAccounts(response);
     } catch (error) {
       toast.error("Unable to get account list");
       throw error;
@@ -37,9 +43,9 @@ function UserManagementPage() {
   // handle delete account
   const onDeleteAccount = async (accountName) => {
     try {
-      await deleteAccountAPI(accountName);
-      toast.success("Account deleted successfully!");
-      getAccounts();
+      // await deleteAccountAPI(accountName);
+      // toast.success("Account deleted successfully!");
+      // getAccounts();
     } catch (error) {
       toast.setError("Account deletion failed");
       throw error;
@@ -49,15 +55,13 @@ function UserManagementPage() {
   const columns = [
     {
       title: "#",
-      dataIndex: "key",
-      key: "key",
-      // render: (_, __, index) => <a>{index + 1}</a>,
+      dataIndex: "id",
+      key: "id",
     },
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
-      render: (text) => <a>{text}</a>,
     },
     {
       title: "Email",
@@ -65,37 +69,34 @@ function UserManagementPage() {
       key: "email",
     },
     {
-      title: "Password",
-      dataIndex: "password",
-      key: "password",
-    },
-    {
       title: "Phone",
       key: "phoneNumber",
       dataIndex: "phoneNumber",
-      // render: (_, { tags }) => (
-      //   <>
-      //     {tags.map((tag) => {
-      //       let color = tag.length > 5 ? "geekblue" : "green";
-      //       if (tag === "loser") {
-      //         color = "volcano";
-      //       }
-      //       return (
-      //         <Tag color={color} key={tag}>
-      //           {tag.toUpperCase()}
-      //         </Tag>
-      //       );
-      //     })}
-      //   </>
-      // ),
+    },
+    {
+      title: "Date Create",
+      dataIndex: "createdAt",
+      key: "createdAt",
     },
     {
       title: "Action",
       key: "action",
       render: () => (
         <Space size="middle">
-          <button className="" onClick={onNavigateToEditAccount}>Edit</button>
-          <button onClick={onDeleteAccount(event)}>Delete</button>
+          <div className="flex items-center">
+            <button
+              onClick={onNavigateToEditAccount}
+              className="text-green-500 text-2xl mr-4 hover:opacity-80 transition"
+            >
+              <EditOutlined />
+            </button>
+            <button
+              onClick={onDeleteAccount()}
+              className="text-red-500 text-2xl hover:opacity-80 transition"
+            >
+              <DeleteOutlined />
+            </button>
+          </div>
         </Space>
       ),
     },
@@ -105,7 +106,7 @@ function UserManagementPage() {
     <Fragment>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">User Management</h2>
-        <ButtonUI title="Add User" onClick={onNavigateToCrateAccount} />
+        <ButtonUI title="Add User" width={'20%'} onClick={onNavigateToCrateAccount} />
         <SearchForm placeholder="Search..." className="ml-4" />
       </div>
       <Table columns={columns} dataSource={accounts} />

@@ -1,259 +1,317 @@
-import * as Yup from "yup";
-import dayjs from "dayjs";
-import ButtonUI from "../../../components/Button";
+import moment from "moment";
+import TextArea from "antd/es/input/TextArea";
+import ButtonUI from "../../../components/button";
 import { toast } from "react-toastify";
-import { useFormik } from "formik";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { PlusOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { movieValidationSchema } from "../../../utils/validations";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  getMovieByIdAPI,
+  updateMovieAPI,
+} from "../../../redux/services/movieAPI";
 import {
   DatePicker,
   Upload,
   InputNumber,
-  Switch,
   Form,
   Row,
   Col,
   Input,
   Space,
 } from "antd";
-import {
-  getMovieInfoAPI,
-  updateMoiveAPI,
-} from "../../../redux/services/movieAPI";
 
 function EditMovieManagement() {
+  const [componentSize, setComponentSize] = useState("default");
   const [fileList, setFileList] = useState([]);
+  const { movieId } = useParams();
   const navigate = useNavigate();
-  const { maPhim } = useParams();
+  const onFormLayoutChange = ({ size }) => {
+    setComponentSize(size);
+  };
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList || [];
+  };
 
-  const validationSchema = Yup.object({
-    maPhim: Yup.string().required("Mã Phim là bắt buộc"),
-    tenPhim: Yup.string().required("Tên Phim là bắt buộc"),
-    biDanh: Yup.string().required("Bí Danh là bắt buộc"),
-    trailer: Yup.string().required("Trailer là bắt buộc"),
-    moTa: Yup.string().required("Mô Tả là bắt buộc"),
-    maNhom: Yup.string().required("Mã Nhóm là bắt buộc"),
-    ngayKhoiChieu: Yup.date().required("Ngày Khởi Chiếu là bắt buộc"),
-    danhGia: Yup.number().required("Đánh Giá là bắt buộc"),
-    hot: Yup.boolean(),
-    dangChieu: Yup.boolean(),
-    sapChieu: Yup.boolean(),
-  });
-
-  const formik = useFormik({
-    initialValues: {
-      maPhim: "",
-      tenPhim: "",
-      biDanh: "",
+  const {
+    handleSubmit,
+    control,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(movieValidationSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      releaseDate: moment().format("YYYY-MM-DD"),
+      cast: "",
       trailer: "",
-      hinhAnh: "",
-      moTa: "",
-      maNhom: "",
-      ngayKhoiChieu: "01/01/1998",
-      danhGia: 0,
-      hot: false,
-      dangChieu: false,
-      sapChieu: false,
-    },
-    validationSchema,
-    onSubmit: async (values) => {
-      if (!fileList.length) {
-        toast.warning("Vui lòng chọn hình ảnh");
-        return;
-      }
-      const payload = {
-        ...values,
-        hinhAnh: fileList[0]?.originFileObj || fileList[0]?.url,
-      };
-      try {
-        await updateMoiveAPI(payload);
-        toast.success("Cập nhật phim thành công");
-        navigate("/movie-management");
-      } catch (error) {
-        toast.error("Cập nhật phim không thành công");
-        throw error;
-      }
+      imageUrl: [],
+      rating: 0,
     },
   });
+
+  const onSubmit = async (values) => {
+    if (!fileList.length) {
+      toast.warning("Please select an image");
+      return;
+    }
+    const payload = {
+      ...values,
+      releaseDate: moment(values.releaseDate).format("YYYY-MM-DD"),
+      imageUrl: fileList[0]?.originFileObj || fileList[0]?.url,
+    };
+    try {
+      await updateMovieAPI(payload);
+      toast.success("Movie update successful");
+      reset();
+      navigate("/movie-management");
+    } catch (error) {
+      toast.error("Movie update failed");
+      throw error;
+    }
+  };
 
   useEffect(() => {
-    const fetchMovieInfo = async () => {
+    const fetchMovie = async () => {
       try {
-        const data = await getMovieInfoAPI(maPhim);
-        formik.setValues({
-          maPhim: data.maPhim,
-          tenPhim: data.tenPhim,
-          biDanh: data.biDanh,
-          trailer: data.trailer,
-          hinhAnh: data.hinhAnh,
-          moTa: data.moTa,
-          maNhom: data.maNhom,
-          ngayKhoiChieu: dayjs(data.ngayKhoiChieu, "DD/MM/YYYY"),
-          danhGia: data.danhGia,
-          hot: data.hot,
-          dangChieu: data.dangChieu,
-          sapChieu: data.sapChieu,
-        });
-        setFileList([
-          {
-            uid: "-1",
-            name: "image.png",
-            status: "done",
-            url: data.hinhAnh,
-          },
-        ]);
+        const response = await getMovieByIdAPI(movieId);
+        const releaseDate = response.data.releaseDate
+          ? moment(response.data.releaseDate, "YYYY-MM-DD")
+          : moment();
+
+        // update data into input box
+        setValue("name", response.data.name),
+          setValue("description", response.data.description),
+          setValue("trailer", response.data.trailer),
+          setValue("imageUrl", response.data.imageUrl),
+          setValue("cast", response.data.cast),
+          setValue("releaseDate", releaseDate._i),
+          setValue("rating", response.data.rating),
+          setFileList([
+            {
+              uid: "-1",
+              name: "image.png",
+              status: "done",
+              url: response.data.imageUrl,
+            },
+          ]);
       } catch (error) {
-        toast.error("Thông tin phim không thể truy cập");
+        toast.error("Movie information not accessible");
         throw error;
       }
     };
-    fetchMovieInfo();
-  }, [maPhim]);
+    fetchMovie();
+  }, []);
 
   return (
-    <>
+    <section className="flex flex-col w-full justify-center items-center">
       <h4 className="text-center mb-6 text-lg font-bold">Update Movie</h4>
-
       <Form
+        labelCol={{
+          span: 4,
+        }}
+        wrapperCol={{
+          span: 14,
+        }}
         layout="horizontal"
-        onFinish={formik.handleSubmit}
-        style={{ maxWidth: 800, margin: "auto" }}
+        initialValues={{
+          size: componentSize,
+        }}
+        onValuesChange={onFormLayoutChange}
+        size={componentSize}
+        style={{
+          maxWidth: 600,
+          paddingLeft: "100px",
+        }}
+        onFinish={handleSubmit(onSubmit)}
       >
         <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Tên Phim">
-              <Input
-                name="tenPhim"
-                value={formik.values.tenPhim}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
+          <Col span={24}>
+            <Form.Item label="Name">
+              <Controller
+                name="name"
+                control={control}
+                render={({ onChange, field }) => {
+                  return <Input onChange={onChange} {...field} />;
+                }}
+                rules={{
+                  required: true,
+                }}
               />
+              {errors.name && (
+                <p className="text-red-500 mb-4">{errors.name.message}</p>
+              )}
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item label="Bí Danh">
-              <Input
-                name="biDanh"
-                value={formik.values.biDanh}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Trailer">
-              <Input
-                name="trailer"
-                value={formik.values.trailer}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
+          <Col span={24}>
             <Form.Item
-              label="Hình Ảnh"
+              label="Image"
               valuePropName="fileList"
-              getValueFromEvent={(e) => e.fileList}
+              getValueFromEvent={normFile}
             >
-              <Upload
-                name="hinhAnh"
-                listType="picture-card"
-                onChange={(info) =>
-                  formik.setFieldValue("hinhAnh", info.fileList)
-                }
-              >
-                <div>
-                  <PlusOutlined />
-                  <div style={{ marginTop: 8 }}>Upload</div>
-                </div>
-              </Upload>
+              <Controller
+                name="imageUrl"
+                control={control}
+                render={({ field }) => {
+                  return (
+                    <Upload
+                      action="/upload.do"
+                      {...field}
+                      onChange={({ fileList: newFileList }) => {
+                        setFileList(newFileList);
+                      }}
+                      fileList={fileList}
+                      listType="picture-card"
+                    >
+                      <div>
+                        <PlusOutlined />
+                        <div
+                          style={{
+                            marginTop: 8,
+                          }}
+                        >
+                          Upload
+                        </div>
+                      </div>
+                    </Upload>
+                  );
+                }}
+                rules={{
+                  required: true,
+                }}
+              />
+              {errors.imageUrl && (
+                <p className="text-red-500 mb-4">{errors.imageUrl.message}</p>
+              )}
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={16}>
           <Col span={24}>
-            <Form.Item label="Mô tả">
-              <Input.TextArea
-                name="moTa"
-                value={formik.values.moTa}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                rows={4}
+            <Form.Item label="Trailer">
+              <Controller
+                name="trailer"
+                control={control}
+                render={({ onChange, field }) => {
+                  return <Input onChange={onChange} {...field} />;
+                }}
+                rules={{
+                  required: true,
+                }}
               />
+              {errors.trailer && (
+                <p className="text-red-500 mb-4">{errors.trailer.message}</p>
+              )}
+            </Form.Item>
+          </Col>
+          <Col span={24}>
+            <Form.Item label="Cast">
+              <Controller
+                name="cast"
+                control={control}
+                render={({ onChange, field }) => {
+                  return <Input onChange={onChange} {...field} />;
+                }}
+                rules={{
+                  required: true,
+                }}
+              />
+              {errors.cast && (
+                <p className="text-red-500 mb-4">{errors.cast.message}</p>
+              )}
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col span={24}>
+            <Form.Item label="Description">
+              <Controller
+                name="description"
+                control={control}
+                render={({ onChange, field }) => {
+                  return (
+                    <TextArea
+                      showCount
+                      rows={8}
+                      onChange={onChange}
+                      {...field}
+                    />
+                  );
+                }}
+                rules={{
+                  required: true,
+                }}
+              />
+              {errors.description && (
+                <p className="text-red-500 mb-4">
+                  {errors.description.message}
+                </p>
+              )}
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item label="Ngày Khởi Chiếu">
-              <Space direction="vertical" size={12}>
-                <DatePicker
-                  format="DD/MM/YYYY"
-                  name="ngayKhoiChieu"
-                  onChange={(date, dateString) =>
-                    formik.setFieldValue("ngayKhoiChieu", dateString)
-                  }
-                  value={
-                    formik.values.ngayKhoiChieu
-                      ? dayjs(formik.values.ngayKhoiChieu, "DD/MM/YYYY")
-                      : null
-                  }
-                />
-              </Space>
+            <Form.Item
+              label="Release Date"
+              labelCol={{
+                style: {
+                  marginRight: 5,
+                },
+              }}
+              rules={{
+                required: true,
+              }}
+            >
+              <Controller
+                name="releaseDate"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Space direction="vertical" size={12}>
+                    <DatePicker
+                      format="YYYY-MM-DD"
+                      onChange={(date) => onChange(date ? date : null)}
+                      value={value ? moment(value) : null}
+                    />
+                  </Space>
+                )}
+                rules={{ required: true }}
+              />
+              {errors.releaseDate && (
+                <p className="text-red-500 mb-4">
+                  {errors.releaseDate.message}
+                </p>
+              )}
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Đánh Giá">
-              <InputNumber
-                name="danhGia"
-                value={formik.values.danhGia}
-                onChange={(value) => formik.setFieldValue("danhGia", value)}
+            <Form.Item label="Rating">
+              <Controller
+                name="rating"
+                control={control}
+                render={({ onChange, field }) => {
+                  return <InputNumber onChange={onChange} {...field} />;
+                }}
               />
+              {errors.rating && (
+                <p className="text-red-500 mb-4">{errors.rating.message}</p>
+              )}
             </Form.Item>
           </Col>
         </Row>
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item label="Hot" valuePropName="checked">
-              <Switch
-                name="hot"
-                checked={formik.values.hot}
-                onChange={(checked) => formik.setFieldValue("hot", checked)}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label="Đang Chiếu" valuePropName="checked">
-              <Switch
-                name="dangChieu"
-                checked={formik.values.dangChieu}
-                onChange={(checked) =>
-                  formik.setFieldValue("dangChieu", checked)
-                }
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label="Sắp Chiếu" valuePropName="checked">
-              <Switch
-                name="sapChieu"
-                checked={formik.values.sapChieu}
-                onChange={(checked) =>
-                  formik.setFieldValue("sapChieu", checked)
-                }
-              />
-            </Form.Item>
-          </Col>
-        </Row>
+
         <Form.Item>
-          <ButtonUI type="submit" title="Thêm Phim" />
+          <ButtonUI type="submit" title="Update movie" />
         </Form.Item>
       </Form>
-    </>
+    </section>
   );
 }
 
