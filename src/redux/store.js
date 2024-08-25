@@ -2,9 +2,10 @@ import storage from "redux-persist/lib/storage";
 import userAdminSlice from "./slices/userAdminSlice";
 import { persistStore, persistReducer } from "redux-persist";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { PERSISTCONFIG_KEY } from "../utils/settings/apiKey";
 
 const persistConfig = {
-  key: "root",
+  key: PERSISTCONFIG_KEY,
   storage: storage,
 };
 

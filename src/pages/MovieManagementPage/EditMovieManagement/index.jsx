@@ -126,7 +126,7 @@ function EditMovieManagement() {
           span: 4,
         }}
         wrapperCol={{
-          span: 14,
+          span: 20,
         }}
         layout="horizontal"
         initialValues={{
@@ -208,7 +208,14 @@ function EditMovieManagement() {
                 name="trailer"
                 control={control}
                 render={({ onChange, field }) => {
-                  return <Input onChange={onChange} {...field} />;
+                  return (
+                    <TextArea
+                      showCount
+                      rows={2}
+                      onChange={onChange}
+                      {...field}
+                    />
+                  );
                 }}
                 rules={{
                   required: true,

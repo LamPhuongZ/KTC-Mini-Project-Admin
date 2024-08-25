@@ -1,26 +1,21 @@
+import {
+  API_DELETE_MOVIE,
+  API_GET_MOVIE_BY_ID,
+  API_GET_MOVIE_BY_NAME,
+  API_GET_MOVIES_ALL,
+  API_POST_MOVIE,
+  API_PUT_MOVIE,
+} from "../../utils/settings/apiKey";
 import instance from "../../config/index";
 
 export const getMovieAllAPI = async () => {
   try {
-    const response = await instance.get(`/api/movies/all`);
-    return response.data;
-  } catch (error) {
-    console.log("API call failed", error);
-    throw error;
-  }
-};
+    const response = await instance.get(API_GET_MOVIES_ALL);
 
-export const getMoviePaginationAPI = async (page, pageSize) => {
-  try {
-    const response = await instance.get(
-      `/api/movies?page=${page}&size=${pageSize}`
-    );
     return {
-      items: response.data,
-      totalCount: response.data.data.totalCount,
+      items: response.data.data.movies,
+      totalCount: response.data.totalCount,
     };
-
-    // return response.data;
   } catch (error) {
     console.log("API call failed", error);
     throw error;
@@ -30,8 +25,7 @@ export const getMoviePaginationAPI = async (page, pageSize) => {
 // delete movie
 export const deleteMovieAPI = async (movieId) => {
   try {
-    const response = await instance.delete(`/api/movies/id?id=${movieId}`);
-    // return true;
+    const response = await instance.delete(`${API_DELETE_MOVIE}?id=${movieId}`);
     return response;
   } catch (error) {
     console.log("API call failed", error);
@@ -54,13 +48,12 @@ export const createMovieAPI = async (movie) => {
       formData.append("image", movie.image);
     }
 
-    const response = await instance.post(`/api/movies`, formData);
+    const response = await instance.post(API_POST_MOVIE, formData);
 
     // Debugging: Inspect FormData contents
     for (let [key, value] of formData.entries()) {
       console.log(`${key}: ${value}`);
     }
-
     return response;
   } catch (error) {
     console.log("API call failed", error);
@@ -71,7 +64,7 @@ export const createMovieAPI = async (movie) => {
 // get movie data by id
 export const getMovieByIdAPI = async (movieId) => {
   try {
-    const response = await instance.get(`/api/movies/id?id=${movieId}`);
+    const response = await instance.get(`${API_GET_MOVIE_BY_ID}?id=${movieId}`);
     return response.data;
   } catch (error) {
     console.log("API call failed", error);
@@ -82,7 +75,9 @@ export const getMovieByIdAPI = async (movieId) => {
 // get movie data by name
 export const getMovieByNameAPI = async (movieName) => {
   try {
-    const response = await instance.get(`/api/movies/title?title=${movieName}`);
+    const response = await instance.get(
+      `${API_GET_MOVIE_BY_NAME}?title=${movieName}`
+    );
     return response.data;
   } catch (error) {
     console.log("API call failed", error);
@@ -105,19 +100,20 @@ export const updateMovieAPI = async (movieId, movie) => {
       formData.append("image", movie.image);
     }
 
-    const response = await instance.put(`/api/movies?id=${movieId}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await instance.put(
+      `${API_PUT_MOVIE}?id=${movieId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
     // Debugging: Inspect FormData contents
     for (let [key, value] of formData.entries()) {
       console.log(`${key}: ${value}`);
     }
-
-    console.log("Update API: ", response);
-
     return response;
   } catch (error) {
     console.log("API call failed", error);

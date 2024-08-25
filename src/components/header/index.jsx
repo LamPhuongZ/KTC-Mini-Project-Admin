@@ -3,7 +3,7 @@ import { Dropdown, Space } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMeAPI } from "../../redux/services/accountAPI";
-import { logout } from "../../redux/slices/userAdminSlice";
+import { logOut } from "../../redux/slices/userAdminSlice";
 
 function Header() {
   const [user, setUser] = useState({});
@@ -19,21 +19,21 @@ function Header() {
 
   const { token } = useSelector((state) => state.userReducer);
   const handleLogOut = () => {
-    dispatch(logout());
-    // Handle logout here
-    localStorage.removeItem("token");
+    dispatch(logOut());
   };
 
   const items = [
     {
       key: "1",
       label: (
-        <li
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-          onClick={handleLogOut}
-        >
-          Log out
-        </li>
+        <ul>
+          <li
+            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+            onClick={handleLogOut}
+          >
+            Log out
+          </li>
+        </ul>
       ),
     },
   ];

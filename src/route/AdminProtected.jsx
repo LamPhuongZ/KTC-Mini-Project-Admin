@@ -12,6 +12,7 @@ function AdminProtected({ children }) {
   const { token } = useSelector((state) => state.userReducer);
 
   const { pathname } = useLocation();
+  
   if (!token) {
     return <Navigate to={`/login?redirectUrl=${pathname}`} replace />;
   }

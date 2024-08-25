@@ -3,7 +3,6 @@ import AdminTemplate from "./templates/AdminTemplate";
 import HomePage from "./pages/HomePage";
 import UserManagementPage from "./pages/UserManagementPage";
 import CreateUserManagement from "./pages/UserManagementPage/CreateUserManagement";
-import EditUserManagement from "./pages/UserManagementPage/EditUserManagement";
 import BookingManagementPage from "./pages/BookingManagementPage";
 import MovieManagementPage from "./pages/MovieManagementPage";
 import CreateMovieManagement from "./pages/MovieManagementPage/CreateMovieManagement";
@@ -24,7 +23,6 @@ function App() {
             <Route path="user-management">
               <Route index element={<UserManagementPage />} />
               <Route path="create" element={<CreateUserManagement />} />
-              <Route path="edit/:email" element={<EditUserManagement />} />
             </Route>
 
             {/* Danh sách phim - Tạo Phim - Edit Phim */}

@@ -17,16 +17,16 @@ instance.interceptors.request.use((config) => {
 });
 
 // Tìm lỗi "401" bằng console.log (error)
-instance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response.status === 401) {
-      window.location.href = `/login?redirectUrl=${window.location.pathname}`;
-    }
-    return Promise.reject(error);
-  }
-);
+// instance.interceptors.response.use(
+//   (response) => {
+//     return response;
+//   },
+//   (error) => {
+//     if (error.response.status === 401) {
+//       window.location.href = `/login?redirectUrl=${window.location.pathname}`;
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 export default instance;

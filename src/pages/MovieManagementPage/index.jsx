@@ -1,13 +1,12 @@
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { Space, Table } from "antd";
+import { Button, Input, Space, Table } from "antd";
 import { useState, useEffect } from "react";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import {
   deleteMovieAPI,
   getMovieAllAPI,
   getMovieByNameAPI,
-  // getMoviePaginationAPI,
 } from "../../redux/services/movieAPI";
 import ButtonUI from "../../components/button";
 import SearchForm from "../../components/SearchForm";
@@ -25,12 +24,13 @@ function MovieManagementPage() {
       title: "#",
       dataIndex: "id",
       key: "id",
-      width: 100  
+      width: 100,
     },
     {
       title: "Image",
       dataIndex: "imageUrl",
       key: "imageUrl",
+      width: 150,
       render: (imageUrl) => (
         <img
           src={imageUrl}
@@ -43,18 +43,38 @@ function MovieManagementPage() {
       title: "Movie Name",
       dataIndex: "name",
       key: "name",
+      width: 200,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div className="p-2">
+          <Input
+            placeholder="Search Movie Name"
+            value={selectedKeys[0]}
+            onChange={(e) =>
+              setSelectedKeys(e.target.value ? [e.target.value] : [])
+            }
+            onPressEnter={() => confirm()}
+            style={{ marginBottom: 8 }}
+          />
+          <Button onClick={() => confirm()} type="primary">
+            Search
+          </Button>
+        </div>
+      ),
+      onFilter: (value, record) =>
+        record.name.toLowerCase().includes(value.toLowerCase()),
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
-      width: 400
+      width: 400,
     },
     {
       title: "Rating",
       key: "rating",
       dataIndex: "rating",
-      width: 100
+      width: 100,
+      sorter: (a, b) => a.rating - b.rating,
     },
     {
       title: "Release Date",
@@ -65,21 +85,22 @@ function MovieManagementPage() {
     {
       title: "Action",
       key: "action",
+      width: 150,
       render: (text, record) => (
         <Space size="middle">
           <div className="flex items-center">
-            <button
+            <Button
               onClick={() => onNavigateToEditMovie(record.id)}
               className="text-green-500 text-2xl mr-4 hover:opacity-80 transition"
             >
               <EditOutlined />
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => onDeleteMovie(record.id)}
               className="text-red-500 text-2xl hover:opacity-80 transition"
             >
               <DeleteOutlined />
-            </button>
+            </Button>
           </div>
         </Space>
       ),
@@ -88,12 +109,9 @@ function MovieManagementPage() {
 
   const fetchMovies = async () => {
     try {
-      // const response = await getMoviePaginationAPI(page, pageSize);
-      // setMovies(response.items.data.movies);
-      // setTotalRows(response.totalCount);
-
       const response = await getMovieAllAPI();
-      setMovies(response.data);
+      setMovies(response.items);
+      setTotalRows(response.totalCount);
     } catch (error) {
       toast.error("Failed to fetch movies");
       console.error(error);
@@ -108,7 +126,6 @@ function MovieManagementPage() {
         setTotalRows(response.totalCount);
         setPage(1); // Reset trang về 1 khi thực hiện tìm kiếm
       } else {
-        // fetchMovies(page, pageSize);
         fetchMovies();
       }
     } catch (error) {
@@ -125,7 +142,6 @@ function MovieManagementPage() {
     try {
       await deleteMovieAPI(movieId);
       toast.success("Movie deleted successfully!");
-      // fetchMovies(page, pageSize);
       fetchMovies();
     } catch (error) {
       toast.error("Movie deletion failed");
@@ -137,21 +153,9 @@ function MovieManagementPage() {
     navigate(`/movie-management/edit/${movieId}`);
   };
 
-  // useEffect(() => {
-  //   fetchMovies(page, pageSize);
-  // }, [page, pageSize]);
-
   useEffect(() => {
     fetchMovies();
   }, []);
-
-  // useEffect(() => {
-  //   if (searchText) {
-  //     fetchSearchMovie(searchText);
-  //   } else {
-  //     fetchMovies(page, pageSize);
-  //   }
-  // }, [page, pageSize, searchText]);
 
   useEffect(() => {
     if (searchText) {
@@ -167,8 +171,8 @@ function MovieManagementPage() {
 
   return (
     <div className="p-8">
+      <h2 className="text-2xl font-bold mb-4">Movie Management</h2>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold mb-4">Movie Management</h2>
         <ButtonUI
           title="Add Movie"
           width={"20%"}
@@ -182,26 +186,24 @@ function MovieManagementPage() {
         />
       </div>
 
-      <div className="w-full h-[300px]">
-        <Table
-          columns={columns}
-          dataSource={movies}
-          pagination={{
-            current: page,
-            pageSize: pageSize,
-            total: totalRows,
-            showSizeChanger: true,
-            pageSizeOptions: ["5", "10", "20", "50"],
-            onChange: (newPage, newPageSize) => {
-              setPage(newPage);
-              setPageSize(newPageSize);
-            },
-          }}
-          rowKey="id"
-          className="custom-table"
-          scroll={{ y: 400 }}
-        />
-      </div>
+      <Table
+        columns={columns}
+        dataSource={movies}
+        pagination={{
+          current: page,
+          pageSize: pageSize,
+          total: totalRows,
+          showSizeChanger: true,
+          pageSizeOptions: ["5", "10", "20", "50"],
+          onChange: (newPage, newPageSize) => {
+            setPage(newPage);
+            setPageSize(newPageSize);
+          },
+        }}
+        rowKey="id"
+        className="custom-table"
+        scroll={{ y: 400 }}
+      />
     </div>
   );
 }

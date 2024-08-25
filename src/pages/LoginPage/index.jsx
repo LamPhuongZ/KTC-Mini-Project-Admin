@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { loginValidationSchema } from "../../utils/validations";
 import { loginRequestAction } from "../../redux/slices/userAdminSlice";
+import { toast } from "react-toastify";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -29,12 +30,18 @@ const LoginPage = () => {
   });
 
   const onSubmit = async (values) => {
-    dispatch(
-      loginRequestAction({
-        email: values.email,
-        password: values.password,
-      })
-    );
+    try {
+      dispatch(
+        loginRequestAction({
+          email: values.email,
+          password: values.password,
+        })
+      );
+      toast.success("Login successful");
+    } catch (error) {
+      toast.error("Login failed");
+      throw error;
+    }
   };
 
   if (token) {

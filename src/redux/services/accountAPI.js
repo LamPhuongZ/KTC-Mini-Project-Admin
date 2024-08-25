@@ -1,5 +1,6 @@
 import instance from "../../config/index";
 import {
+  API_GET_ACCOUNT,
   API_GET_ACCOUNTS,
   API_POST_ACCOUNT,
 } from "../../utils/settings/apiKey";
@@ -26,38 +27,10 @@ export async function createAccountAPI(payload) {
   }
 }
 
-// Call API lấy thông tin tài khoản
-export async function getAccountAPI(accountName) {
-  try {
-    // const response = await instance.post(
-    //   `/QuanLyNguoiDung/LayThongTinNguoiDung?taiKhoan=${accountName}`
-    // );
-    // return response.data.content;
-  } catch (error) {
-    console.log("API call failed", error);
-    throw error;
-  }
-}
-
-// Call API cập nhật thông tin
-export const updateAccountAPI = async (account) => {
-  try {
-    // const payload = { ...account };
-    // const { data } = await instance.post(
-    //   "/QuanLyNguoiDung/CapNhatThongTinNguoiDung",
-    //   payload
-    // );
-    // return data;
-  } catch (error) {
-    console.log("API call failed", error);
-    throw error;
-  }
-};
-
 // Call API xóa tài khoản
 export async function deleteAccountAPI(accountId) {
   try {
-    const response = await instance.put(`/api/users/${accountId}`);
+    const response = await instance.put(`${API_POST_ACCOUNT}/${accountId}`);
     return response;
   } catch (error) {
     console.log("API call failed", error);
@@ -67,7 +40,7 @@ export async function deleteAccountAPI(accountId) {
 
 export const getMeAPI = async () => {
   try {
-    const response = await instance.get(`/api/users/me`);
+    const response = await instance.get(API_GET_ACCOUNT);
     return response.data;
   } catch (error) {
     console.log("API call failed", error);

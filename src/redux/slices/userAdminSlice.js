@@ -4,6 +4,7 @@ import {
 } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { loginRequest } from "../services/loginAPI";
+import { TOKEN_KEY } from "../../utils/settings/apiKey";
 
 export const loginRequestAction = createAsyncThunk(
   "userAdminSlice/login",
@@ -11,7 +12,7 @@ export const loginRequestAction = createAsyncThunk(
     try {
       const userInfo = await loginRequest(values);
       const { token } = userInfo;
-      localStorage.setItem("token", token);
+      localStorage.setItem(TOKEN_KEY, token);
       return userInfo;
     } catch (error) {
       toast.error(error);
@@ -26,12 +27,14 @@ const initialState = {
   error: "",
 };
 
+// createSlice: tạo ra các slice, xử lý các action trả về
 const userReducer = createSlice({
   name: "userAdminSlice",
   initialState,
   reducers: {
-    logout: (state) => {
+    logOut: (state) => {
       state.token = null;
+      localStorage.removeItem('token')
     },
   },
   extraReducers: (builder) => {
@@ -51,4 +54,4 @@ const userReducer = createSlice({
 });
 
 export default userReducer.reducer;
-export const { logout } = userReducer.actions;
+export const { logOut } = userReducer.actions;

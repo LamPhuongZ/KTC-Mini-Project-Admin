@@ -71,7 +71,7 @@ function CreateMovieManagement() {
 
       toast.success("Add movie successfully");
       reset();
-      navigator("/movie-management")
+      navigator("/movie-management");
     } catch (error) {
       console.error("API call failed", error);
       toast.error("Add movie failed");
@@ -86,7 +86,7 @@ function CreateMovieManagement() {
           span: 4,
         }}
         wrapperCol={{
-          span: 14,
+          span: 20,
         }}
         layout="horizontal"
         initialValues={{
@@ -96,19 +96,21 @@ function CreateMovieManagement() {
         size={componentSize}
         style={{
           maxWidth: 600,
-          paddingLeft: "100px",
         }}
         onFinish={handleSubmit(onSubmit)}
       >
         <Row gutter={16}>
           <Col span={24}>
-            <Form.Item label="Name">
+            <Form.Item
+              label="Name"
+            >
               <Controller
                 name="name"
                 control={control}
                 render={({ onChange, field }) => {
                   return <Input onChange={onChange} {...field} />;
                 }}
+                style={{ width: "100%" }}
                 rules={{
                   required: true,
                 }}
@@ -159,7 +161,14 @@ function CreateMovieManagement() {
                 name="trailer"
                 control={control}
                 render={({ onChange, field }) => {
-                  return <Input onChange={onChange} {...field} />;
+                  return (
+                    <TextArea
+                      showCount
+                      rows={2}
+                      onChange={onChange}
+                      {...field}
+                    />
+                  );
                 }}
                 rules={{
                   required: true,
