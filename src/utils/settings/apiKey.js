@@ -7,7 +7,7 @@ export const PERSISTCONFIG_KEY = `root`;
 export const API_LOGIN = `/api/auth/admins/login`;
 
 // KEY ACCOUNT
-export const API_GET_ACCOUNTS = `/api/users?pageNo=0&pageSize=20&sortBy=id&sortDir=desc`;
+export const API_GET_ACCOUNTS = `/api/users`;
 export const API_POST_ACCOUNT = `/api/users`;
 export const API_DELETE_ACCOUNT = `/api/users`;
 export const API_GET_ACCOUNT = `/api/users/me`;

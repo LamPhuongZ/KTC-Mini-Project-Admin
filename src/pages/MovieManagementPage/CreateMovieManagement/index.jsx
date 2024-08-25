@@ -3,6 +3,7 @@ import TextArea from "antd/es/input/TextArea";
 import ButtonUI from "../../../components/button";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { PlusOutlined } from "@ant-design/icons";
 import { createMovieAPI } from "../../../redux/services/movieAPI";
@@ -20,6 +21,7 @@ import {
 } from "antd";
 
 function CreateMovieManagement() {
+  const navigator = useNavigate();
   const [componentSize, setComponentSize] = useState("default");
   const onFormLayoutChange = ({ size }) => {
     setComponentSize(size);
@@ -31,6 +33,7 @@ function CreateMovieManagement() {
     }
     return e?.fileList || [];
   };
+  
 
   const {
     handleSubmit,
@@ -45,7 +48,8 @@ function CreateMovieManagement() {
       releaseDate: null,
       cast: "",
       trailer: "",
-      image: [],
+      posterImage: [],
+      bannerImage: [],
       rating: 0,
     },
   });
@@ -56,9 +60,14 @@ function CreateMovieManagement() {
       releaseDate: values.releaseDate
         ? moment(values.releaseDate).format("YYYY-MM-DD")
         : null,
-      image:
-        values.image && values.image.length > 0
-          ? values.image[0].originFileObj
+      posterImage:
+        values.posterImage && values.posterImage.length > 0
+          ? values.posterImage[0].originFileObj
+          : null,
+
+      bannerImage:
+        values.bannerImage && values.bannerImage.length > 0
+          ? values.bannerImage[0].originFileObj
           : null,
     };
 
@@ -67,7 +76,7 @@ function CreateMovieManagement() {
     try {
       const response = await createMovieAPI(payload);
 
-      console.log(response);
+      console.log(response);  
 
       toast.success("Add movie successfully");
       reset();
@@ -101,9 +110,7 @@ function CreateMovieManagement() {
       >
         <Row gutter={16}>
           <Col span={24}>
-            <Form.Item
-              label="Name"
-            >
+            <Form.Item label="Name">
               <Controller
                 name="name"
                 control={control}
@@ -122,12 +129,12 @@ function CreateMovieManagement() {
           </Col>
           <Col span={24}>
             <Form.Item
-              label="Image"
+              label="Poster"
               valuePropName="fileList"
               getValueFromEvent={normFile}
             >
               <Controller
-                name="image"
+                name="posterImage"
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <Upload
@@ -148,9 +155,36 @@ function CreateMovieManagement() {
                   required: "Image is required",
                 }}
               />
-              {errors.image && (
-                <p className="text-red-500 mb-4">{errors.image.message}</p>
-              )}
+            </Form.Item>
+          </Col>
+          <Col span={24}>
+            <Form.Item
+              label="Banner"
+              valuePropName="fileList"
+              getValueFromEvent={normFile}
+            >
+              <Controller
+                name="bannerImage"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Upload
+                    beforeUpload={() => false}
+                    onChange={(info) => {
+                      onChange(info.fileList);
+                    }}
+                    fileList={value || []}
+                    listType="picture-card"
+                  >
+                    <div>
+                      <PlusOutlined />
+                      <div style={{ marginTop: 8 }}>Upload</div>
+                    </div>
+                  </Upload>
+                )}
+                rules={{
+                  required: "Image is required",
+                }}
+              />
             </Form.Item>
           </Col>
         </Row>

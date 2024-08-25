@@ -31,7 +31,7 @@ function UserManagementPage() {
   }, []);
 
   // handle redirect to create account page
-  const onNavigateToCrateAccount = () => {
+  const onNavigateToCreateAccount = () => {
     navigate("/user-management/create");
   };
 
@@ -99,7 +99,7 @@ function UserManagementPage() {
           <ButtonUI
             title="Add User"
             width={"20%"}
-            onClick={onNavigateToCrateAccount}
+            onClick={onNavigateToCreateAccount}
           />
           <SearchForm placeholder="Search..." className="ml-4" />
         </div>

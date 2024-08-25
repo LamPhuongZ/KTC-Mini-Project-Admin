@@ -25,7 +25,8 @@ import ButtonUI from "../../../components/button";
 
 function EditMovieManagement() {
   const [componentSize, setComponentSize] = useState("default");
-  const [fileList, setFileList] = useState([]);
+  const [filePosterList, setFilePosterList] = useState([]);
+  const [fileBannerList, setFileBannerList] = useState([]);
   const { movieId } = useParams();
   const navigate = useNavigate();
 
@@ -33,11 +34,18 @@ function EditMovieManagement() {
     setComponentSize(size);
   };
 
-  const normFile = (e) => {
+  const normPosterFile = (e) => {
     if (Array.isArray(e)) {
       return e;
     }
-    return e?.fileList || [];
+    return e?.filePosterList || [];
+  };
+
+  const normBannerFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileBannerList || [];
   };
 
   const {
@@ -54,29 +62,26 @@ function EditMovieManagement() {
       releaseDate: moment().format("YYYY-MM-DD"),
       cast: "",
       trailer: "",
-      image: [],
+      posterImage: [],
+      bannerImage: [],
       rating: 0,
     },
   });
 
   const onSubmit = async (values) => {
-    if (!fileList.length) {
+    if (!filePosterList.length || !fileBannerList.length) {
       toast.warning("Please select an image");
       return;
     }
     const payload = {
       ...values,
       releaseDate: moment(values.releaseDate).format("YYYY-MM-DD"),
-      image: fileList[0]?.originFileObj || fileList[0]?.url,
+      posterImage: filePosterList[0]?.originFileObj || filePosterList[0]?.url,
+      bannerImage: fileBannerList[0]?.originFileObj || fileBannerList[0]?.url,
     };
 
-    console.log(payload);
-
     try {
-      const response = await updateMovieAPI(movieId, payload);
-
-      console.log("Update: ", response);
-
+      await updateMovieAPI(movieId, payload);
       toast.success("Movie update successful");
       reset();
       navigate("/movie-management");
@@ -98,16 +103,25 @@ function EditMovieManagement() {
         setValue("name", response.data.name),
           setValue("description", response.data.description),
           setValue("trailer", response.data.trailer),
-          setValue("image", response.data.imageUrl),
+          setValue("posterImage", response.data.posterImage),
+          setValue("bannerImage", response.data.bannerImage),
           setValue("cast", response.data.cast),
           setValue("releaseDate", releaseDate._i),
           setValue("rating", response.data.rating),
-          setFileList([
+          setFilePosterList([
             {
               uid: "-1",
               name: "image.png",
               status: "done",
-              url: response.data.imageUrl,
+              url: response.data.posterImage,
+            },
+          ]);
+          setFileBannerList([
+            {
+              uid: "-1",
+              name: "image.png",
+              status: "done",
+              url: response.data.bannerImage,
             },
           ]);
       } catch (error) {
@@ -160,12 +174,12 @@ function EditMovieManagement() {
           </Col>
           <Col span={24}>
             <Form.Item
-              label="Image"
+              label="Poster"
               valuePropName="fileList"
-              getValueFromEvent={normFile}
+              getValueFromEvent={normPosterFile}
             >
               <Controller
-                name="image"
+                name="posterImage"
                 control={control}
                 render={({ field }) => {
                   return (
@@ -173,9 +187,9 @@ function EditMovieManagement() {
                       action="/upload.do"
                       {...field}
                       onChange={({ fileList: newFileList }) => {
-                        setFileList(newFileList);
+                        setFilePosterList(newFileList);
                       }}
-                      fileList={fileList}
+                      fileList={filePosterList}
                       listType="picture-card"
                     >
                       <div>
@@ -195,8 +209,50 @@ function EditMovieManagement() {
                   required: true,
                 }}
               />
-              {errors.image && (
-                <p className="text-red-500 mb-4">{errors.image.message}</p>
+              {errors.posterImage && (
+                <p className="text-red-500 mb-4">{errors.posterImage.message}</p>
+              )}
+            </Form.Item>
+          </Col>
+          <Col span={24}>
+            <Form.Item
+              label="Banner"
+              valuePropName="fileList"
+              getValueFromEvent={normBannerFile}
+            >
+              <Controller
+                name="bannerImage"
+                control={control}
+                render={({ field }) => {
+                  return (
+                    <Upload
+                      action="/upload.do"
+                      {...field}
+                      onChange={({ fileList: newFileList }) => {
+                        setFileBannerList(newFileList);
+                      }}
+                      fileList={fileBannerList}
+                      listType="picture-card"
+                    >
+                      <div>
+                        <PlusOutlined />
+                        <div
+                          style={{
+                            marginTop: 8,
+                          }}
+                        >
+                          Upload
+                        </div>
+                      </div>
+                    </Upload>
+                  );
+                }}
+                rules={{
+                  required: true,
+                }}
+              />
+              {errors.bannerImage && (
+                <p className="text-red-500 mb-4">{errors.bannerImage.message}</p>
               )}
             </Form.Item>
           </Col>

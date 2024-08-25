@@ -5,7 +5,7 @@ const instance = axios.create({
   headers: {
     "ngrok-skip-browser-warning": "69420",
   },
-});6
+});
 
 // Cấu hình headers trước khi gửi lên server:
 instance.interceptors.request.use((config) => {

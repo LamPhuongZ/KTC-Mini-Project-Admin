@@ -38,14 +38,24 @@ export const createMovieAPI = async (movie) => {
   try {
     const formData = new FormData();
 
+    console.log("Movie API", movie);
+    
+
     for (let key in movie) {
-      if (movie[key] !== null && key !== "image") {
+      if (
+        movie[key] !== null &&
+        (key !== "posterImage" || key !== "bannerImage")
+      ) {
         formData.append(key, movie[key]);
       }
     }
 
-    if (movie.image && movie.image instanceof File) {
-      formData.append("image", movie.image);
+    if (
+      (movie.posterImage || movie.bannerImage) &&
+      (movie.posterImage instanceof File || movie.bannerImage instanceof File)
+    ) {
+      formData.append("posterImage", movie.posterImage);
+      formData.append("bannerImage", movie.bannerImage);
     }
 
     const response = await instance.post(API_POST_MOVIE, formData);
@@ -91,23 +101,30 @@ export const updateMovieAPI = async (movieId, movie) => {
     const formData = new FormData();
 
     for (let key in movie) {
-      if (movie[key] !== null && key !== "image") {
+      if (
+        movie[key] !== null &&
+        (key !== "posterImage" || key !== "bannerImage")
+      ) {
         formData.append(key, movie[key]);
       }
     }
 
-    if (movie.image && movie.image instanceof File) {
-      formData.append("image", movie.image);
+    if (
+      (movie.posterImage || movie.bannerImage) &&
+      (movie.posterImage instanceof File || movie.bannerImage instanceof File)
+    ) {
+      formData.append("posterImage", movie.posterImage);
+      formData.append("bannerImage", movie.bannerImage);
     }
 
     const response = await instance.put(
       `${API_PUT_MOVIE}?id=${movieId}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      formData
+      // {
+      //   headers: {
+      //     "Content-Type": "multipart/form-data",
+      //   },
+      // }
     );
 
     // Debugging: Inspect FormData contents

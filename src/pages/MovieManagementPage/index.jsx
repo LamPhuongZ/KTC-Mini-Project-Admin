@@ -27,14 +27,27 @@ function MovieManagementPage() {
       width: 100,
     },
     {
-      title: "Image",
-      dataIndex: "imageUrl",
-      key: "imageUrl",
+      title: "Poster Image",
+      dataIndex: "posterImageUrl",
+      key: "posterImageUrl",
       width: 150,
-      render: (imageUrl) => (
+      render: (posterImageUrl) => (
         <img
-          src={imageUrl}
+          src={posterImageUrl}
           alt="Movie Poster"
+          style={{ width: 100, height: 100, objectFit: "cover" }}
+        />
+      ),
+    },
+    {
+      title: "Banner Image",
+      dataIndex: "bannerImageUrl",
+      key: "bannerImageUrl",
+      width: 150,
+      render: (bannerImageUrl) => (
+        <img
+          src={bannerImageUrl}
+          alt="Movie Banner"
           style={{ width: 100, height: 100, objectFit: "cover" }}
         />
       ),
