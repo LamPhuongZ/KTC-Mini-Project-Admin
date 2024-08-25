@@ -120,12 +120,12 @@ function BookingManagementPage() {
   ];
 
   return (
-    <div className="p-8">
+    <div className="p-8 hidden md:block">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold mb-4">Booking Management</h2>
         <SearchForm
           placeholder="Search...."
-          className="ml-4"
+          className="w-full md:w-auto mt-4 md:mt-0 ml-0 md:ml-4"
           // onClick={fetchSearchMovie}
         />
       </div>

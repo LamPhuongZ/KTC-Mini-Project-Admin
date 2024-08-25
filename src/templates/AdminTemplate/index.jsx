@@ -10,6 +10,7 @@ import {
 import { Button, Layout, Menu, theme } from "antd";
 import HeaderComponent from "../../components/Header";
 import AdminProtected from "../../route/AdminProtected";
+import { useWindowResize } from "../../hooks/useWindowResize";
 const { Header, Sider, Content } = Layout;
 
 function getItem(label, key, children) {
@@ -25,6 +26,10 @@ function AdminTemplate() {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+
+  // Custom hook usage
+  useWindowResize(890, setCollapsed, null);
+
   return (
     <div>
       <Layout>

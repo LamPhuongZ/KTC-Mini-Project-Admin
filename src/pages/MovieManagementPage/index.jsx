@@ -183,17 +183,17 @@ function MovieManagementPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-8 hidden md:block">
       <h2 className="text-2xl font-bold mb-4">Movie Management</h2>
       <div className="flex justify-between items-center mb-4">
         <ButtonUI
           title="Add Movie"
-          width={"20%"}
+          width="full md:w-1/5"
           onClick={onNavigateToAddMovie}
         />
         <SearchForm
           placeholder="Search movie name...."
-          className="ml-4"
+          className="w-full md:w-auto mt-4 md:mt-0 ml-0 md:ml-4"
           onChange={onChangeInput}
           onClick={() => fetchSearchMovie(searchText)}
         />

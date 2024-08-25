@@ -6,9 +6,9 @@ import {
 } from "../../utils/settings/apiKey";
 
 // Call API lấy danh dách người dùng
-export const getAccountAllAPI = async () => {
+export const getAccountAllAPI = async (page, pageSize) => {
   try {
-    const response = await instance.get(API_GET_ACCOUNTS);
+    const response = await instance.get(`${API_GET_ACCOUNTS}?pageNo=${page}&pageSize=${pageSize}&sortDir=desc`);
     return response.data;
   } catch (error) {
     console.log("API call failed", error);

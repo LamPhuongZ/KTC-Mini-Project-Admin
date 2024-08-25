@@ -8,11 +8,13 @@ import MovieManagementPage from "./pages/MovieManagementPage";
 import CreateMovieManagement from "./pages/MovieManagementPage/CreateMovieManagement";
 import EditMovieManagement from "./pages/MovieManagementPage/EditMovieManagement";
 import LoginPage from "./pages/LoginPage";
+import { FeatureNotificationPage } from "./pages/FeatureNotificationPage";
 
 function App() {
   return (
     <>
       <BrowserRouter>
+        <FeatureNotificationPage />
         <Routes>
           {/* Route trang chủ */}
           <Route path="/" element={<AdminTemplate />}>
