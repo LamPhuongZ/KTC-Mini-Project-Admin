@@ -1,4 +1,5 @@
 import axios from "axios";
+import { TOKEN_KEY } from "../utils/settings/apiKey";
 
 const instance = axios.create({
   baseURL: " https://apparently-uncommon-gopher.ngrok-free.app",
@@ -9,9 +10,9 @@ const instance = axios.create({
 
 // Cấu hình headers trước khi gửi lên server:
 instance.interceptors.request.use((config) => {
-  const isLogin = localStorage.getItem("token") ? true : false;
+  const isLogin = localStorage.getItem(TOKEN_KEY) ? true : false;
   config.headers.Authorization = isLogin
-    ? `Bearer ${localStorage.getItem("token")}`
+    ? `Bearer ${localStorage.getItem(TOKEN_KEY)}`
     : "";
   return config;
 });

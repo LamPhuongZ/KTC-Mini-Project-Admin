@@ -34,7 +34,7 @@ const userReducer = createSlice({
   reducers: {
     logOut: (state) => {
       state.token = null;
-      localStorage.removeItem('token')
+      localStorage.removeItem(TOKEN_KEY)
     },
   },
   extraReducers: (builder) => {

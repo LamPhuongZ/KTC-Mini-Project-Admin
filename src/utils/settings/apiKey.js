@@ -1,6 +1,6 @@
 // KEY
 export const DOMAIN = `https://apparently-uncommon-gopher.ngrok-free.app`;
-export const TOKEN_KEY = `token`;
+export const TOKEN_KEY = `adminToken`;
 export const PERSISTCONFIG_KEY = `root`;
 
 // KEY LOGIN
