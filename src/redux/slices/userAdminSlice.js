@@ -12,7 +12,7 @@ export const loginRequestAction = createAsyncThunk(
     try {
       const userInfo = await loginRequest(values);
       const { token } = userInfo;
-      localStorage.setItem(TOKEN_KEY, token);
+      localStorage.setItem(TOKEN_KEY, token); 
       return userInfo;
     } catch (error) {
       toast.error(error);
